@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package com.agenda_distribuida.protos;
+
+option java_package = "com.agenda_distribuida.protos";
+option java_outer_classname = "ContatoProto";
+
+enum Tipo {
+    PESSOAL = 0;
+    TRABALHO = 1;
+}
+
+message Data {
+    optional int32 dia = 1;
+    optional int32 mes = 2;
+    optional int32 ano = 3;
+}
+
+message Endereco {
+    optional string rua = 1;
+    optional string bairro = 2; 
+    optional string cidade = 3;
+    optional string cep = 4;
+    optional Tipo tipo = 5;
+}
+
+message Telefone {
+    optional string telefone = 1;
+    optional Tipo tipo = 2;
+}
+
+message Email {
+    optional string email = 1;
+    optional Tipo tipo = 2;
+}
+
+message Contato {
+    int32 id = 1;
+    string primeiroNome = 2;
+    optional string ultimoNome = 3;
+    repeated Telefone telefones = 4;
+    optional Data diaAniversario = 5;
+    repeated Email emails = 6;
+    repeated Endereco enderecos = 7;
+}
