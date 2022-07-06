@@ -1,9 +1,11 @@
-package agenda;
+package contato;
 
+import java.io.Serializable;
 import java.util.Date;
+
 import utilitario.Validador;
 
-public class Contato {
+public class Contato implements Serializable {
     private final int id;
     private String primeiroNome;
     private String ultimoNome;
@@ -45,7 +47,7 @@ public class Contato {
     }
 
     public String toString() {
-        String endereco_str = String.format("ID: %d\nPrimeiro Nome: %s\nTelefone 01: %s\n",
+        String endereco_str = String.format("{\"id\":%d,\"primeiroNome\":\"%s\",\"telefone01\":\"%s\"}",
                                             this.id, this.primeiroNome, this.telefone01);
 
         return endereco_str;    

@@ -1,4 +1,4 @@
-package agenda;
+package contato;
 
 import utilitario.Validador;
 
