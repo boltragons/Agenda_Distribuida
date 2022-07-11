@@ -31,4 +31,18 @@ public class Validador {
     public static boolean validarIdentificador(String identificador) {
         return (identificador != null && !(identificador.isEmpty()));
    }
+
+   /**
+    * Valida um endereço de e-mail.
+    *
+    * @param email O endereço de e-mail.
+    * @return "true" se o e-mail é valido, e "false" caso
+    *         contrário.
+    */
+   public static boolean validarEmail(String email) throws IllegalArgumentException {
+       if (email == null || email.isEmpty()) {
+           throw new IllegalArgumentException("Informe um endereço de e-mail!");
+       }
+       return email.matches("^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$");
+   }  
 }

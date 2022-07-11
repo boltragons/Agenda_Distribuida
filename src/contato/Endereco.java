@@ -1,16 +1,16 @@
 package contato;
 
+import java.io.Serializable;
+
 import utilitario.Validador;
 
-public class Endereco {
+public class Endereco implements Serializable {
     private String rua;
     private String bairro; 
     private String cidade;
     private String cep;
 
     public Endereco(String rua, String bairro, String cidade) throws IllegalArgumentException {
-        
-        // Valida os dados obrigatórios do endereço e os preenche.
         setRua(rua);
         setBairro(bairro);
         setCidade(cidade);
@@ -20,8 +20,9 @@ public class Endereco {
         
         this(rua, bairro, cidade);
 
-        // CEP não é obrigatório, mas se for preenchido deve estar correto!
-        setCep(cep);
+        if(cep != null) {
+            setCep(cep);
+        }
     }
     
     public String getRua() {
@@ -62,19 +63,19 @@ public class Endereco {
     }
 
     public void setCep(String cep) throws IllegalArgumentException {
-        if(cep != null && !Validador.validarCep(cep)) {
+        if(!Validador.validarCep(cep)) {
             throw new IllegalArgumentException("Erro: CEP informado inválido!");
         }
         this.cep = cep;
     }
 
     public String toString() {
-        String endereco_str = String.format("Rua: %s\nBairro: %s\nCidade: %s\n",
+        String endereco_str = String.format("{\"rua\":\"%s\",\"bairro\":\"%s\",\"cidade\":\"%s\"",
                                             this.rua, this.bairro, this.cidade);
         if(this.cep != null) {
-            endereco_str = endereco_str + String.format("CEP: %s\n", this.cep);
+            endereco_str = endereco_str + String.format(",\"cep\":\"%s\"", this.cep);
         }
 
-        return endereco_str;    
+        return endereco_str + "}";    
     }
 }

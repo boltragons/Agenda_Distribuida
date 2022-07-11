@@ -3,6 +3,7 @@ package server;
 import java.io.IOException;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 
 import org.json.JSONObject;
 
@@ -10,21 +11,23 @@ public class ServerConnection extends Thread {
     private DatagramPacket packet;
     private DatagramSocket socket;
     private Despachante despachante;
+    private HashMap<Integer, byte[]> historicoMensagens;
 
     public ServerConnection(DatagramSocket socket) {
         this.socket = socket;
         this.despachante = new Despachante();
+        this.historicoMensagens = new HashMap<>(); 
     }
 
-    public byte[] empacotaMensagem(String objectRef, String method, String args) {
-		JSONObject mensagem = new JSONObject();
-		mensagem.put("type", 1);
-        mensagem.put("id", 0);
-		mensagem.put("objReference", objectRef);
-		mensagem.put("methodId", method);
-		mensagem.put("arguments", args);
+    public byte[] empacotaMensagem(JSONObject mensagem, String args) {
+		JSONObject resposta = new JSONObject();
+		resposta.put("type", 1);
+        resposta.put("id", (int) mensagem.get("id"));
+		resposta.put("objReference", (String) mensagem.get("objReference"));
+		resposta.put("methodId", (String) mensagem.get("methodId"));
+		resposta.put("arguments", args);
 
-        return mensagem.toString().getBytes();
+        return resposta.toString().getBytes();
     }
     
     public static JSONObject desempacotaMensagem(byte[] resposta) {
@@ -35,18 +38,41 @@ public class ServerConnection extends Thread {
     public void run() {
         while(true) {
             byte[] m = receive();
-
+            
             // =============== Mensagem Recebida ====================
             System.out.println("RECEBIDA:" + (new String(m)));
 
             JSONObject mensagem = desempacotaMensagem(m);
+
+            if(mensagem.get("arguments").toString().equals("Finaliza")) {
+                this.historicoMensagens = new HashMap<>(); 
+                continue;
+            }
+            
+            int id = (int) mensagem.get("id");
+
+            if(this.historicoMensagens.containsKey(id)) {
+                System.out.println("REENVIANDO ID " + id);
+                send(this.historicoMensagens.get(id));
+                continue;
+            }
+
             String resultado = despachante.selecionaEsqueleto(mensagem);
 
-            byte[] buf = empacotaMensagem((String) mensagem.get("objReference"),
-                                          (String) mensagem.get("methodId"),
-                                          resultado);
+            byte[] buf = empacotaMensagem(mensagem, resultado);    
+            
+            this.historicoMensagens.put(id, buf);
+
             // ============== Mensagem Enviada ==================
             System.out.println("ENVIADA: " + (new String(buf)));
+            
+            // TESTAR RETRANSMISSAO
+            try {
+                sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
             send(buf);
         }
     }
@@ -61,7 +87,7 @@ public class ServerConnection extends Thread {
             e.printStackTrace();
         }
 
-        // Limapr o lixo
+        // Limpar o lixo
         byte[] aux = new byte[packet.getLength()];
         for (int i = 0; i < packet.getLength(); i++) {
             aux[i] = packet.getData()[i];

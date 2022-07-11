@@ -11,6 +11,7 @@ public class UDPClient{
     public UDPClient() throws SocketException, UnknownHostException {
         socket = new DatagramSocket();
         address = InetAddress.getByName("localhost");
+        socket.setSoTimeout(1000);
     }
 
     public void sendEcho(byte[] buf) throws IOException {
@@ -22,6 +23,7 @@ public class UDPClient{
     public byte[] receiveEcho() throws IOException {
         byte[] buf = new byte[1024];
         DatagramPacket packet = new DatagramPacket(buf, buf.length);
+        
         socket.receive(packet);
         
         byte[] aux = new byte[packet.getLength()];
