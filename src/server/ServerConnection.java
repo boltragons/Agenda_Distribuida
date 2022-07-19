@@ -38,9 +38,6 @@ public class ServerConnection extends Thread {
     public void run() {
         while(true) {
             byte[] m = receive();
-            
-            // =============== Mensagem Recebida ====================
-            System.out.println("RECEBIDA:" + (new String(m)));
 
             JSONObject mensagem = desempacotaMensagem(m);
 
@@ -52,7 +49,6 @@ public class ServerConnection extends Thread {
             int id = (int) mensagem.get("id");
 
             if(this.historicoMensagens.containsKey(id)) {
-                System.out.println("REENVIANDO ID " + id);
                 send(this.historicoMensagens.get(id));
                 continue;
             }
@@ -62,9 +58,6 @@ public class ServerConnection extends Thread {
             byte[] buf = empacotaMensagem(mensagem, resultado);    
             
             this.historicoMensagens.put(id, buf);
-
-            // ============== Mensagem Enviada ==================
-            System.out.println("ENVIADA: " + (new String(buf)));
             
             // TESTAR RETRANSMISSAO
             try {
